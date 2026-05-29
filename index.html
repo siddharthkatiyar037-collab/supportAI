@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SupportAI — Multilingual Customer Support Bot</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap" rel="stylesheet" />
+
+  <!-- Tabler Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="src/styles/main.css" />
+</head>
+<body>
+
+  <div id="app">
+
+    <!-- ═══════════════════════════════════════
+         SIDEBAR
+    ════════════════════════════════════════ -->
+    <aside class="sidebar" id="sidebar" role="complementary" aria-label="Conversation history">
+
+      <!-- Brand -->
+      <div class="sidebar__brand">
+        <div class="sidebar__brand-icon" aria-hidden="true">
+          <i class="ti ti-robot"></i>
+        </div>
+        <div class="sidebar__brand-text">
+          <span class="sidebar__brand-name">SupportAI</span>
+          <span class="sidebar__brand-tagline">Multilingual Bot</span>
+        </div>
+        <button class="sidebar__close-btn" id="sidebarCloseBtn" aria-label="Close sidebar">
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <!-- New conversation -->
+      <button class="sidebar__new-btn" onclick="App.resetChat()">
+        <i class="ti ti-plus" aria-hidden="true"></i>
+        New Conversation
+      </button>
+
+      <!-- Session list -->
+      <p class="sidebar__section-label">Recent</p>
+      <nav class="sidebar__sessions" aria-label="Recent conversations">
+
+        <div class="session-item session-item--active">
+          <span class="session-item__dot session-item__dot--online" aria-hidden="true"></span>
+          <div class="session-item__info">
+            <span class="session-item__name">Current session</span>
+            <span class="session-item__meta">Just now</span>
+          </div>
+          <span class="lang-pill lang-pill--en" id="sidebarLangPill">EN</span>
+        </div>
+
+        <div class="session-item">
+          <span class="session-item__dot session-item__dot--resolved" aria-hidden="true"></span>
+          <div class="session-item__info">
+            <span class="session-item__name">Priya Sharma</span>
+            <span class="session-item__meta">5 min · Resolved</span>
+          </div>
+          <span class="lang-pill lang-pill--hinglish">HI+EN</span>
+        </div>
+
+        <div class="session-item">
+          <span class="session-item__dot session-item__dot--resolved" aria-hidden="true"></span>
+          <div class="session-item__info">
+            <span class="session-item__name">Raj Kumar</span>
+            <span class="session-item__meta">20 min · Resolved</span>
+          </div>
+          <span class="lang-pill lang-pill--hindi">HI</span>
+        </div>
+
+        <div class="session-item">
+          <span class="session-item__dot session-item__dot--escalated" aria-hidden="true"></span>
+          <div class="session-item__info">
+            <span class="session-item__name">Maria López</span>
+            <span class="session-item__meta">1 hr · Escalated</span>
+          </div>
+          <span class="lang-pill lang-pill--spanish">ES</span>
+        </div>
+
+        <div class="session-item">
+          <span class="session-item__dot session-item__dot--resolved" aria-hidden="true"></span>
+          <div class="session-item__info">
+            <span class="session-item__name">Ahmed Al-Farsi</span>
+            <span class="session-item__meta">2 hr · Resolved</span>
+          </div>
+          <span class="lang-pill lang-pill--arabic">AR</span>
+        </div>
+
+      </nav>
+
+      <!-- Footer stats -->
+      <div class="sidebar__footer" aria-label="Bot statistics">
+        <div class="sidebar__stat">
+          <span class="sidebar__stat-value">8</span>
+          <span class="sidebar__stat-label">Languages</span>
+        </div>
+        <div class="sidebar__stat-divider" aria-hidden="true"></div>
+        <div class="sidebar__stat">
+          <span class="sidebar__stat-value">24/7</span>
+          <span class="sidebar__stat-label">Online</span>
+        </div>
+        <div class="sidebar__stat-divider" aria-hidden="true"></div>
+        <div class="sidebar__stat">
+          <span class="sidebar__stat-value">AI</span>
+          <span class="sidebar__stat-label">Powered</span>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- ═══════════════════════════════════════
+         MAIN CHAT AREA
+    ════════════════════════════════════════ -->
+    <main class="chat" role="main">
+
+      <!-- Top bar -->
+      <header class="topbar" role="banner">
+
+        <button class="topbar__menu-btn" id="menuBtn" aria-label="Open navigation sidebar">
+          <i class="ti ti-menu-2"></i>
+        </button>
+
+        <div class="topbar__center">
+          <span class="topbar__status-dot" aria-hidden="true"></span>
+          <span class="topbar__title">SupportAI</span>
+          <div class="topbar__detect-badge" id="detectBadge" aria-live="polite" aria-label="Detected language">
+            <i class="ti ti-language" aria-hidden="true"></i>
+            <span id="detectBadgeLabel">Auto</span>
+          </div>
+        </div>
+
+        <div class="topbar__actions">
+
+          <!-- Language selector -->
+          <div class="lang-selector" id="langSelector">
+            <button
+              class="btn btn--ghost"
+              id="langSelectorBtn"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-label="Select language"
+              onclick="App.toggleLangDropdown()"
+            >
+              <i class="ti ti-world" aria-hidden="true"></i>
+              <span id="langSelectorLabel">Auto</span>
+              <i class="ti ti-chevron-down" style="font-size:10px;opacity:.6" aria-hidden="true"></i>
+            </button>
+
+            <ul class="lang-dropdown hidden" id="langDropdown" role="listbox" aria-label="Language options">
+              <li class="lang-dropdown__heading" aria-hidden="true">Select language</li>
+              <li class="lang-dropdown__item lang-dropdown__item--active" role="option" aria-selected="true"  data-lang="auto"     onclick="App.setLanguage('auto')">🌐 Auto-detect</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="en"       onclick="App.setLanguage('en')">🇬🇧 English</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="hi"       onclick="App.setLanguage('hi')">🇮🇳 Hindi</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="hinglish" onclick="App.setLanguage('hinglish')">🇮🇳 Hinglish</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="ar"       onclick="App.setLanguage('ar')">🇸🇦 Arabic</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="es"       onclick="App.setLanguage('es')">🇪🇸 Spanish</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="fr"       onclick="App.setLanguage('fr')">🇫🇷 French</li>
+              <li class="lang-dropdown__item" role="option" aria-selected="false" data-lang="de"       onclick="App.setLanguage('de')">🇩🇪 German</li>
+            </ul>
+          </div>
+
+          <button class="btn btn--ghost" onclick="App.showFAQPanel()" title="Show FAQs">
+            <i class="ti ti-list-search" aria-hidden="true"></i>
+            <span>FAQs</span>
+          </button>
+
+          <button class="btn btn--danger" id="escalateBtn" onclick="App.escalateToHuman()" title="Escalate to human agent">
+            <i class="ti ti-headset" aria-hidden="true"></i>
+            <span>Escalate</span>
+          </button>
+        </div>
+
+      </header>
+
+      <!-- Language banner -->
+      <div class="lang-banner" id="langBanner" role="status" aria-live="polite">
+        <i class="ti ti-language" aria-hidden="true"></i>
+        <span id="langBannerText">Type in any language — Hindi, Hinglish, English, Arabic, Spanish aur bhi!</span>
+      </div>
+
+      <!-- Message feed -->
+      <div
+        class="messages"
+        id="messages"
+        role="log"
+        aria-live="polite"
+        aria-label="Chat messages"
+        aria-relevant="additions"
+      ></div>
+
+      <!-- Escalation notice -->
+      <div class="escalation-notice hidden" id="escalationNotice" role="alert">
+        <i class="ti ti-alert-circle" aria-hidden="true"></i>
+        <div class="escalation-notice__text">
+          <strong>Connected to human agent.</strong>
+          You are #2 in queue — estimated wait ~3 minutes.
+        </div>
+        <button
+          class="escalation-notice__close"
+          aria-label="Dismiss"
+          onclick="document.getElementById('escalationNotice').classList.add('hidden')"
+        >
+          <i class="ti ti-x"></i>
+        </button>
+      </div>
+
+      <!-- Message input -->
+      <div class="input-bar">
+        <textarea
+          id="messageInput"
+          class="input-bar__textarea"
+          placeholder="Kuch bhi poochho — Hindi, Hinglish, or English…"
+          rows="1"
+          aria-label="Type your message"
+          onkeydown="App.handleInputKeydown(event)"
+          oninput="App.autoResizeTextarea(this)"
+        ></textarea>
+        <button
+          class="input-bar__send-btn"
+          id="sendBtn"
+          onclick="App.sendMessage()"
+          aria-label="Send message"
+        >
+          <i class="ti ti-send"></i>
+        </button>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- ═══════════════════════════════════════
+       SCRIPTS (load order matters)
+  ════════════════════════════════════════ -->
+  <script src="src/utils/langDetect.js"></script>
+  <script src="src/utils/faqEngine.js"></script>
+  <script src="src/utils/claudeApi.js"></script>
+  <script src="src/components/chatUI.js"></script>
+  <script src="src/components/app.js"></script>
+
+</body>
+</html>
